@@ -11,7 +11,7 @@ void ThreadHandler::AddThread(Thread const& thread)
 	m_threads.push_back(thread);
 }
 
-void ThreadHandler::Execute()
+void ThreadHandler::Wait()
 {
 	WaitForMultipleObjects(m_threads.size(), m_threads.data(), TRUE, INFINITE);
 }

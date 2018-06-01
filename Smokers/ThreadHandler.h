@@ -9,7 +9,7 @@ public:
 	ThreadHandler();
 	~ThreadHandler();
 	void AddThread(Thread const& thread);
-	void Execute();
+	void Wait();
 private:
 	Threads m_threads;
 };

@@ -3,17 +3,17 @@
 class Smoker
 {
 public:
-	Smoker(size_t idSmoker, Ingredient ingredient);
-	void TwistCigarette();
+	Smoker(size_t idSmoker, std::string ingredient, std::vector<std::string> &table, std::shared_ptr<Event> wakeMediator, std::shared_ptr<Event> wakeSmoker);
+
 	void SmokeCigerette();
-	void SetIngredient(Ingredient ingrdedient);
-	Ingredient GetIngredient();
+	std::string GetIngredient();
 	size_t GetId();
-	bool CanSmoke(ListOfIngredients list);
+	bool CanSmoke(const std::vector<std::string> &list);
 	~Smoker();
 private:
-	Ingredient m_ingredient;
+	std::string m_ingredient;
 	size_t m_idSmoker;
+	std::vector<std::string> &m_table;
 	std::shared_ptr<Event> m_wakeSmoker;
 	std::shared_ptr<Event> m_wakeMediator;
 };

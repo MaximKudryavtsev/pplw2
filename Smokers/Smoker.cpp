@@ -2,18 +2,16 @@
 #include "Smoker.h"
 
 
-Smoker::Smoker(size_t idSmoker, Ingredient ingredient)
+Smoker::Smoker(size_t idSmoker, std::string ingredient, std::vector<std::string> &table, std::shared_ptr<Event> wakeMediator, std::shared_ptr<Event> wakeSmoker)
 	:m_idSmoker(idSmoker)
 	,m_ingredient(ingredient)
+	,m_table(table)
+	,m_wakeSmoker(wakeSmoker)
+	,m_wakeMediator(wakeMediator)
 {
 }
 
-void Smoker::SetIngredient(Ingredient ingredient)
-{
-	m_ingredient = ingredient;
-}
-
-Ingredient Smoker::GetIngredient()
+std::string Smoker::GetIngredient()
 {
 	return m_ingredient;
 }
@@ -24,24 +22,33 @@ size_t Smoker::GetId()
 }
 
 
-
-bool Smoker::CanSmoke(ListOfIngredients list)
+bool Smoker::CanSmoke(const std::vector<std::string> &list)
 {
 	return std::find(list.begin(), list.end(), m_ingredient) == list.end();
 }
 
-void Smoker::TwistCigarette()
-{
-	std::cout << "Smoker #" << m_idSmoker << " is twisting a cigarette..." << std::endl;
-	
-	Sleep(TWISTING_TIME);
-	std::cout << "Smoker #" << m_idSmoker << " has finished to twist a cigarette" << std::endl;
-}
-
 void Smoker::SmokeCigerette()
 {
-	std::cout << "Smoker #" << m_idSmoker << " is smoking a cigarette" << std::endl;
-	Sleep(SMOKING_TIME);
+	while (true)
+	{
+		m_wakeSmoker->WaitUntilSignalled();
+		m_wakeMediator->SetUnsignalled();
+		
+		if (CanSmoke(m_table))
+		{
+			Sleep(500);
+			std::printf("Smoker #%zd ", m_idSmoker);
+			std::printf("%s ", m_ingredient);
+			
+			/*for (size_t i = 0; i < m_table.size(); i++)
+			{
+				std::printf("%s ", m_table[i]);
+			}*/
+			std::printf("\n");
+			m_wakeMediator->SetSignalled();
+		}
+		
+	}
 }
 
 Smoker::~Smoker()
