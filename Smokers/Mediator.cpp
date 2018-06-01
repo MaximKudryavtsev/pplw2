@@ -2,18 +2,18 @@
 #include "Mediator.h"
 
 
-Mediator::Mediator(std::vector<std::string> &table, std::shared_ptr<Event> wakeMediator, std::shared_ptr<Event> wakeSmoker)
+Mediator::Mediator(Table &table, std::shared_ptr<Event> wakeMediator, std::shared_ptr<Event> wakeSmoker)
 	:m_table(table)
 	,m_wakeMediator(wakeMediator)
 	,m_wakeSmoker(wakeSmoker)
 {
 	Shuffle();
-	m_mediatorIngredients = table;
+	table.SetIngredients(m_mediatorIngredients);
 }
-
 
 std::vector<std::string> &Mediator::GetIngredients()
 {
+	Shuffle();
 	return m_mediatorIngredients;
 }
 
@@ -21,22 +21,16 @@ void Mediator::Work()
 {
 	while (true)
 	{
-		m_wakeMediator->WaitUntilSignalled();
-		m_wakeSmoker->SetUnsignalled();
-
+		m_wakeSmoker->WaitUntilSignalled();
 		
-		m_table.clear();
-		for (size_t i = 0; i < m_mediatorIngredients.size(); i++)
+		if (m_table.IsEmpty())
 		{
-			m_table.push_back(m_mediatorIngredients[i]);
+			m_table.SetIngredients(GetIngredients());
+			m_wakeMediator->SetSignalled();
+			m_wakeSmoker->SetUnsignalled();
 		}
-		Shuffle();
-		m_wakeMediator->SetUnsignalled();
-		m_wakeSmoker->SetSignalled();
 	}
 }
-
-
 
 Mediator::~Mediator()
 {
